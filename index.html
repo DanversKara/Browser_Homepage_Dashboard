@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Karas App Dash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* ─── Theme Variables ─── */
+    :root {
+      --primary:    #2ecc71;
+      --secondary:  #3498db;
+      --accent:     #9b59b6;
+      --bg:         #061a0e;
+      --text:       #ecf0f1;
+      --text-muted: #7abb8e;
+      --card:       rgba(255,255,255,0.04);
+      --card-hov:   rgba(255,255,255,0.08);
+      --border:     rgba(255,255,255,0.08);
+      --shadow:     rgba(0,0,0,0.55);
+      --glass:      blur(12px);
+      --r-sm:       8px;
+      --r-md:       12px;
+      --r-full:     9999px;
+      --t-fast:     0.15s ease;
+      --t:          0.2s ease;
+      --t-slow:     0.6s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.9s ease, color 0.9s ease;
+    }
+
+    ::selection { background: var(--primary); color: #000; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--card-hov); border-radius: 3px; }
+
+    /* ─── Ambient Background ─── */
+    .bg-glow {
+      position: fixed; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      pointer-events: none; z-index: 0;
+      animation: glowSpin 35s linear infinite;
+      transition: background 1.2s ease;
+    }
+    @keyframes glowSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── Holiday Particles ─── */
+    .holiday-bg { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+    .snow-dot { position: absolute; background: rgba(255,255,255,0.85); border-radius: 50%; animation: snowFall linear infinite; }
+    @keyframes snowFall {
+      0%   { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.8; } 90%  { opacity: 0.8; }
+      100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+    }
+    .heart-dot { position: absolute; color: #e84393; animation: heartRise linear infinite; }
+    @keyframes heartRise {
+      0%   { transform: translateY(105vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.9; } 90% { opacity: 0.9; }
+      100% { transform: translateY(-80px) rotate(30deg); opacity: 0; }
+    }
+    .bat-dot { position: absolute; font-size: 20px; animation: batFly linear infinite; }
+    @keyframes batFly {
+      0%   { transform: translateX(-100px) scaleX(1); opacity: 0; } 5%  { opacity: 0.7; } 95% { opacity: 0.7; }
+      100% { transform: translateX(calc(100vw + 100px)) scaleX(1); opacity: 0; }
+    }
+    .confetti-dot { position: absolute; border-radius: 2px; animation: confettiFall linear infinite; }
+    @keyframes confettiFall {
+      0%   { transform: translateY(-50px) rotate(0deg); opacity: 0.9; }
+      100% { transform: translateY(105vh) rotate(720deg); opacity: 0.3; }
+    }
+    .firefly-dot { position: absolute; border-radius: 50%; width: 4px; height: 4px; animation: fireflyGlow ease-in-out infinite; }
+    @keyframes fireflyGlow {
+      0%,100% { transform: translate(0,0); opacity: 0.15; box-shadow: 0 0 4px currentColor; }
+      50%      { transform: translate(15px,-15px); opacity: 1; box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+    }
+    .leaf-dot { position: absolute; width: 12px; height: 12px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); animation: leafFall linear infinite; }
+    @keyframes leafFall {
+      0%   { transform: translateY(-60px) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(105vh) rotate(720deg); opacity: 0.2; }
+    }
+    .star-dot { position: absolute; animation: starTwinkle ease-in-out infinite; }
+    @keyframes starTwinkle { 0%,100% { opacity: 0.15; transform: scale(0.6); } 50% { opacity: 1; transform: scale(1.3); } }
+    .petal-dot { position: absolute; width: 8px; height: 8px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); animation: petalFall linear infinite; }
+    @keyframes petalFall { 0% { transform: translateY(-60px) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(105vh) rotate(360deg); opacity: 0.2; } }
+    .bunny-dot { position: absolute; animation: bunnyHop ease-in-out infinite; }
+    @keyframes bunnyHop { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(8deg); } }
+
+    /* ─── Tech Animation Layers ─── */
+    .tech-layer {
+      position: absolute; inset: 0;
+      overflow: hidden; pointer-events: none; z-index: 0;
+    }
+    .tech-layer.footer-layer { opacity: 0.45; }
+
+    .tech-grid-bg {
+      position: absolute; width: 200%; height: 200%;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 28px 28px;
+      animation: gridDrift 22s linear infinite; opacity: 0.5;
+    }
+    .footer-layer .tech-grid-bg { background-size: 20px 20px; animation: gridDrift2 32s linear infinite; opacity: 0.25; }
+    @keyframes gridDrift  { 0% { transform: translate(0,0); } 100% { transform: translate(-28px,-28px); } }
+    @keyframes gridDrift2 { 0% { transform: translate(0,0); } 100% { transform: translate(-20px,-20px); } }
+
+    .circuit-wrap { position: absolute; inset: 0; }
+    .c-line {
+      position: absolute;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      height: 1.5px;
+      animation: cFlow 3.2s linear infinite; opacity: 0;
+    }
+    @keyframes cFlow {
+      0%   { width: 0%;   left: 0;    opacity: 0; }
+      8%   { opacity: 0.55; }
+      92%  { opacity: 0.55; }
+      100% { width: 100%; left: 100%; opacity: 0; }
+    }
+    .footer-layer .c-line {
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      height: 1px;
+      animation: cFlowF 4.5s linear infinite;
+    }
+    @keyframes cFlowF {
+      0%   { width: 0%;   left: 0;    opacity: 0; }
+      8%   { opacity: 0.3; }
+      92%  { opacity: 0.3; }
+      100% { width: 100%; left: 100%; opacity: 0; }
+    }
+
+    .dot-wrap { position: absolute; inset: 0; }
+    .c-dot {
+      position: absolute; width: 4px; height: 4px;
+      background: var(--accent); border-radius: 50%;
+      box-shadow: 0 0 7px var(--accent);
+      animation: dotPulse 2.3s ease-in-out infinite; opacity: 0;
+    }
+    @keyframes dotPulse {
+      0%,100% { transform: scale(1);   opacity: 0.25; }
+      50%      { transform: scale(1.8); opacity: 0.85; }
+    }
+
+    .icon-wrap { position: absolute; inset: 0; }
+    .c-icon {
+      position: absolute; font-size: 16px; opacity: 0;
+      animation: iconDrift 9s ease-in-out infinite;
+      filter: drop-shadow(0 0 4px currentColor);
+    }
+    @keyframes iconDrift {
+      0%,100% { transform: translateY(0) rotate(0deg);    opacity: 0.18; }
+      50%      { transform: translateY(-14px) rotate(6deg); opacity: 0.5; }
+    }
+
+    .bin-rain { position: absolute; inset: 0; overflow: hidden; }
+    .bin-d {
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; font-size: 10px; opacity: 0;
+      animation: binFall linear infinite;
+      text-shadow: 0 0 4px currentColor;
+    }
+    @keyframes binFall {
+      0%   { transform: translateY(-30px);  opacity: 0; }
+      8%   { opacity: 0.55; }
+      90%  { opacity: 0.55; }
+      100% { transform: translateY(130px);  opacity: 0; }
+    }
+    .footer-layer .bin-d { font-size: 8px; }
+
+    .holo {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 18%, transparent 82%, rgba(255,255,255,0.1) 100%);
+      animation: holoScan 5s linear infinite; opacity: 0.12;
+    }
+    @keyframes holoScan {
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(250%); }
+    }
+
+    /* ─── Layout ─── */
+    #app {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ─── Top Bar ─── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6, 26, 14, 0.8);
+      backdrop-filter: var(--glass);
+      -webkit-backdrop-filter: var(--glass);
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: background 0.9s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .topbar-logo {
+      display: flex; align-items: center; gap: 0.5rem;
+      flex-shrink: 0; position: relative; z-index: 2;
+    }
+    .topbar-logo .logo-icon {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; color: #000; font-weight: 700;
+      box-shadow: 0 0 10px var(--primary);
+    }
+    .topbar-logo .logo-name {
+      font-size: 0.95rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--text) 40%, var(--primary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+
+    .search-wrap {
+      flex: 1; max-width: 400px; position: relative; z-index: 2;
+    }
+    .search-wrap i {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 0.8rem; pointer-events: none;
+    }
+    #searchInput {
+      width: 100%; padding: 0.4rem 0.75rem 0.4rem 2rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r-full); color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 0.85rem;
+      outline: none; transition: all var(--t);
+    }
+    #searchInput:focus { border-color: var(--primary); background: var(--card-hov); }
+
+    .topbar-right {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-left: auto; position: relative; z-index: 2;
+    }
+
+    .clock-wrap { text-align: right; }
+    #clockTime {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--primary); line-height: 1.1;
+      text-shadow: 0 0 8px var(--primary);
+    }
+    #clockDate {
+      font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;
+    }
+
+    .theme-pill {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r-full); padding: 4px 10px;
+      font-size: 10px; font-weight: 600; color: var(--text);
+      cursor: pointer; transition: all var(--t); white-space: nowrap;
+    }
+    .theme-pill i { color: var(--primary); }
+
+    /* ─── Main Content ─── */
+    .content {
+      flex: 1; padding: 1rem;
+      max-width: 1400px; width: 100%; margin: 0 auto;
+    }
+
+    .category {
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.4s ease-out both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .cat-header {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 0.6rem; cursor: pointer;
+      user-select: none;
+    }
+    .cat-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+    .cat-title-icon { color: var(--primary); font-size: 0.7rem; }
+    .cat-divider {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+    .chevron {
+      font-size: 0.6rem; color: var(--text-muted);
+      transition: transform var(--t);
+    }
+    .category.collapsed .chevron { transform: rotate(-90deg); }
+    .category.collapsed .app-grid { display: none; }
+
+    /* ─── App Grid ─── */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 0.6rem;
+    }
+
+    /* ─── App Tile ─── */
+    .app-tile {
+      position: relative; overflow: hidden;
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      -webkit-backdrop-filter: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 0.75rem 0.5rem;
+      text-decoration: none; color: var(--text);
+      display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+      text-align: center;
+      cursor: pointer; transition: all var(--t);
+      min-height: 85px;
+    }
+    .app-tile::before {
+      content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+      background: var(--tile-color, var(--primary));
+      opacity: 0; transition: opacity var(--t);
+    }
+    .app-tile:hover {
+      background: var(--card-hov);
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,0.15);
+    }
+    .app-tile:hover::before { opacity: 1; }
+
+    .tile-icon-wrap {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      background: var(--tile-bg, rgba(46,204,113,0.1));
+      color: var(--tile-color, var(--primary));
+      transition: transform var(--t);
+    }
+    .app-tile:hover .tile-icon-wrap { transform: scale(1.1); }
+
+    .tile-name {
+      font-size: 0.75rem; font-weight: 600;
+      line-height: 1.2;
+    }
+    .tile-desc {
+      font-size: 0.65rem; color: var(--text-muted);
+      line-height: 1.2; display: -webkit-box;
+      -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      position: relative; overflow: hidden; isolation: isolate;
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      -webkit-backdrop-filter: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 0.6rem 0.8rem;
+      text-align: center; color: var(--text-muted); font-size: 0.68rem;
+      box-shadow: 0 4px 24px var(--shadow);
+      margin: 0 1rem 1rem;
+    }
+    .footer p { position: relative; z-index: 2; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 600px) {
+      .topbar { padding: 0.4rem 0.6rem; gap: 0.5rem; }
+      .topbar-logo .logo-name { display: none; }
+      .theme-pill span { display: none; }
+      .clock-wrap { display: none; }
+      .content { padding: 0.75rem; }
+      .app-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; }
+      #searchInput { font-size: 0.8rem; }
+    }
+    @media (min-width: 900px) {
+      .app-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    }
+
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--card); backdrop-filter: var(--glass);
+      color: var(--text); padding: 8px 20px; border-radius: var(--r-full);
+      z-index: 9999; opacity: 0; transition: opacity 0.3s ease; font-size: 12px;
+      border: 1px solid var(--border); pointer-events: none;
+    }
+    .no-results {
+      display: none; text-align: center; padding: 3rem 1rem; color: var(--text-muted);
+    }
+    .no-results.show { display: block; }
+    .no-results i { font-size: 2rem; margin-bottom: 0.5rem; display: block; opacity: 0.3; }
+  </style>
+</head>
+<body>
+
+  <div class="holiday-bg" id="holidayBg"></div>
+  <div class="bg-glow" id="bgGlow"></div>
+  <div class="bg-grid"></div>
+
+  <div id="app">
+    <header class="topbar" id="topbar">
+      <!-- Tech Layer Integrated -->
+      <div class="tech-layer" id="heroLayer"></div>
+      
+      <div class="topbar-logo">
+        <div class="logo-icon"><i class="fas fa-th"></i></div>
+        <span class="logo-name" id="dashTitle">Kara's App Dash</span>
+      </div>
+
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search apps…" autocomplete="off">
+      </div>
+
+      <div class="topbar-right">
+        <div class="clock-wrap">
+          <div id="clockTime">00:00:00</div>
+          <div id="clockDate">Loading…</div>
+        </div>
+
+        <div class="theme-pill" id="themePill" onclick="previewNextTheme()" title="Preview themes">
+          <i class="fas fa-palette"></i>
+          <span id="themeLabel">Loading…</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content" id="contentArea"></div>
+
+    <div class="no-results" id="noResults">
+      <i class="fas fa-search"></i>
+      <div>No apps found for "<span id="noResultsQuery"></span>"</div>
+    </div>
+
+    <footer class="footer" id="footerEl">
+      <!-- Tech Layer Integrated -->
+      <div class="tech-layer footer-layer" id="footerLayer"></div>
+      <p>© 2026 Browsing For Your Info · <span id="footerDate"></span></p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  /* ══════════════════════════════════════════
+     DATA
+  ══════════════════════════════════════════ */
+  const DEFAULT_DATA = {
+    title: "Karas App Dash",
+    categories: [
+      {
+        id: "media", name: "Media", icon: "fas fa-film",
+        apps: [
+          { id: "photos", name: "Public Photos",  url: "https://cloud.browsing.fyi/d/d36d60fb026f434893a7/",  icon: "fas fa-cloud",          color: "#e84393", desc: "Kara's Vault"     },
+        ]
+      },
+      { id: "infra", name: "COMING SOON", icon: "fas fa-server", apps: [] },
+      { id: "network", name: "MIGHT BE COMING SOON", icon: "fas fa-network-wired", apps: [] },
+      { id: "tools", name: "PROB NEVER COMING SOON", icon: "fas fa-tools", apps: [] },
+      {
+        id: "dev", name: "ADMIN TAB", icon: "fas fa-code",
+        apps: [
+          { id: "cloud",     name: "Cloud Vault",      url: "https://cloud.browsing.fyi/", icon: "fas fa-cloud",        color: "#00a4dc", desc: "Storage"          },
+          { id: "login",  name: "YunoHost",  url: "http://umbrel.local", icon: "fas fa-sign-in",     color: "#1abc9c", desc: "Portal"    },
+          { id: "npm",   name: "NPM",   url: "http://umbrel.local:4498", icon: "fas fa-network-wired",       color: "#007acc", desc: "Proxy"   },
+        ]
+      },
+    ]
+  };
+
+  let appData = JSON.parse(localStorage.getItem('dashboardData') || 'null') || DEFAULT_DATA;
+
+  /* ══════════════════════════════════════════
+     RENDER
+  ══════════════════════════════════════════ */
+  function render(filter = '') {
+    const area = document.getElementById('contentArea');
+    area.innerHTML = '';
+    const q = filter.trim().toLowerCase();
+    let anyVisible = false;
+
+    document.getElementById('dashTitle').textContent = appData.title || 'Karas App Dash';
+    document.title = appData.title || 'Karas App Dash';
+
+    appData.categories.forEach(cat => {
+      const apps = q ? cat.apps.filter(a => a.name.toLowerCase().includes(q) || (a.desc||'').toLowerCase().includes(q)) : cat.apps;
+      if (q && apps.length === 0) return;
+      anyVisible = true;
+
+      const catEl = document.createElement('div');
+      catEl.className = 'category';
+      catEl.dataset.catId = cat.id;
+
+      catEl.innerHTML = `
+        <div class="cat-header" onclick="toggleCategory(this)">
+          <i class="cat-title-icon ${cat.icon || 'fas fa-folder'}"></i>
+          <span class="cat-title">${cat.name}</span>
+          <div class="cat-divider"></div>
+          <i class="fas fa-chevron-down chevron"></i>
+        </div>
+        <div class="app-grid" id="grid-${cat.id}"></div>
+      `;
+      area.appendChild(catEl);
+
+      const grid = catEl.querySelector(`#grid-${cat.id}`);
+      apps.forEach(app => grid.appendChild(buildTile(app, cat.id)));
+    });
+
+    document.getElementById('noResults').classList.toggle('show', !anyVisible && q.length > 0);
+    document.getElementById('noResultsQuery').textContent = q;
+  }
+
+  function buildTile(app, catId) {
+    const tile = document.createElement('a');
+    tile.className = 'app-tile';
+    tile.href = app.url || '#';
+    if (app.url) tile.target = '_blank';
+    tile.rel = 'noopener noreferrer';
+    tile.style.setProperty('--tile-color', app.color || 'var(--primary)');
+    tile.style.setProperty('--tile-bg', hexToRgba(app.color || '#2ecc71', 0.15));
+
+    tile.innerHTML = `
+      <div class="tile-icon-wrap"><i class="${app.icon || 'fas fa-link'}"></i></div>
+      <span class="tile-name">${app.name}</span>
+      ${app.desc ? `<span class="tile-desc">${app.desc}</span>` : ''}
+    `;
+    return tile;
+  }
+
+  function toggleCategory(headerEl) {
+    const category = headerEl.parentElement;
+    category.classList.toggle('collapsed');
+  }
+
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  /* ══════════════════════════════════════════
+     TECH ANIMATIONS (From example.html)
+  ══════════════════════════════════════════ */
+  function buildTechLayer(id, binCount, lineCount) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    const p = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+    const s = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
+    const a = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+    const grid = document.createElement('div');
+    grid.className = 'tech-grid-bg';
+    el.appendChild(grid);
+
+    const cw = document.createElement('div'); cw.className = 'circuit-wrap';
+    for (let i = 0; i < lineCount; i++) {
+      const ln = document.createElement('div'); ln.className = 'c-line';
+      ln.style.top   = `${15 + i * (65 / lineCount)}%`;
+      ln.style.animationDelay = `${i * 1.1}s`;
+      cw.appendChild(ln);
+    }
+    el.appendChild(cw);
+
+    const dw = document.createElement('div'); dw.className = 'dot-wrap';
+    for (let i = 0; i < 8; i++) {
+      const d = document.createElement('div'); d.className = 'c-dot';
+      d.style.left  = `${Math.random() * 96}%`;
+      d.style.top   = `${Math.random() * 90}%`;
+      d.style.animationDelay = `${Math.random() * 2.5}s`;
+      dw.appendChild(d);
+    }
+    el.appendChild(dw);
+
+    const iw = document.createElement('div'); iw.className = 'icon-wrap';
+    const iconSet = ['fas fa-microchip','fas fa-code','fas fa-server','fas fa-terminal','fas fa-wifi','fas fa-database'];
+    const clrs = [p, s, a];
+    for (let i = 0; i < 4; i++) {
+      const ic = document.createElement('i');
+      ic.className = `c-icon ${iconSet[i % iconSet.length]}`;
+      ic.style.top   = `${8  + Math.random() * 75}%`;
+      ic.style.left  = `${5  + Math.random() * 88}%`;
+      ic.style.color = clrs[i % 3];
+      ic.style.animationDelay = `${Math.random() * 6}s`;
+      iw.appendChild(ic);
+    }
+    el.appendChild(iw);
+
+    const br = document.createElement('div'); br.className = 'bin-rain';
+    for (let i = 0; i < binCount; i++) {
+      const d = document.createElement('span'); d.className = 'bin-d';
+      d.textContent = Math.random() > 0.5 ? '1' : '0';
+      d.style.left  = `${Math.random() * 100}%`;
+      d.style.animationDuration = `${Math.random() * 3.5 + 2.5}s`;
+      d.style.animationDelay    = `${Math.random() * 6}s`;
+      d.style.color = Math.random() > 0.5 ? p : s;
+      br.appendChild(d);
+    }
+    el.appendChild(br);
+    setInterval(() => br.querySelectorAll('.bin-d').forEach(d => { d.textContent = Math.random() > 0.5 ? '1' : '0'; }), 1100);
+
+    const h = document.createElement('div'); h.className = 'holo';
+    el.appendChild(h);
+  }
+
+  /* ══════════════════════════════════════════
+     CLOCK & UTILS
+  ══════════════════════════════════════════ */
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clockTime').textContent = now.toLocaleTimeString('en-US', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    document.getElementById('clockDate').textContent = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+    document.getElementById('footerDate').textContent = now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  }
+  setInterval(updateClock, 1000); updateClock();
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.opacity = '1';
+    setTimeout(() => t.style.opacity = '0', 3000);
+  }
+
+  document.getElementById('searchInput').oninput = e => render(e.target.value);
+
+  /* ══════════════════════════════════════════
+     THEME SYSTEM
+  ══════════════════════════════════════════ */
+  const THEMES = {
+    0: { name:"Winter Frost", primary:"#3498db", secondary:"#1abc9c", accent:"#9b59b6", bg:"#060d1c", muted:"#7ba8cc", fx:"snow" },
+    1: { name:"Valentine's Love", primary:"#e74c3c", secondary:"#e84393", accent:"#fd79a8", bg:"#180608", muted:"#c07898", fx:"hearts" },
+    2: { name:"Spring Green", primary:"#2ecc71", secondary:"#f1c40f", accent:"#27ae60", bg:"#031008", muted:"#6aba80", fx:"fireflies" },
+    3: { name:"Easter", primary:"#9b59b6", secondary:"#e84393", accent:"#f1c40f", bg:"#130820", muted:"#a880c8", fx:"bunnies" },
+    4: { name:"May Flowers", primary:"#e91e8c", secondary:"#9b59b6", accent:"#1abc9c", bg:"#100618", muted:"#c070b0", fx:"petals" },
+    5: { name:"Summer Pride", primary:"#e74c3c", secondary:"#f39c12", accent:"#3498db", bg:"#180608", muted:"#c09080", fx:"fireflies" },
+    6: { name:"4th of July", primary:"#e74c3c", secondary:"#3498db", accent:"#f1c40f", bg:"#060c18", muted:"#8090b8", fx:"stars" },
+    7: { name:"Summer Heat", primary:"#e67e22", secondary:"#e74c3c", accent:"#f1c40f", bg:"#140a02", muted:"#c08060", fx:"fireflies" },
+    8: { name:"Labor Day", primary:"#d35400", secondary:"#3498db", accent:"#f1c40f", bg:"#0a1414", muted:"#809898", fx:"leaves" },
+    9: { name:"Halloween", primary:"#9b59b6", secondary:"#f1c40f", accent:"#e74c3c", bg:"#0c0608", muted:"#8860a8", fx:"bats" },
+    10: { name:"Thanksgiving", primary:"#d35400", secondary:"#f39c12", accent:"#27ae60", bg:"#140c04", muted:"#c08840", fx:"leaves" },
+    11: { name:"Christmas", primary:"#e74c3c", secondary:"#2ecc71", accent:"#f1c40f", bg:"#020802", muted:"#88b888", fx:"snow" },
+  };
+
+  function applyTheme(t) {
+    const r = document.documentElement;
+    r.style.setProperty('--primary', t.primary);
+    r.style.setProperty('--secondary', t.secondary);
+    r.style.setProperty('--accent', t.accent);
+    r.style.setProperty('--bg', t.bg);
+    r.style.setProperty('--text-muted', t.muted);
+    document.getElementById('themeLabel').textContent = t.name;
+    document.getElementById('bgGlow').style.background = `
+      radial-gradient(ellipse at 20% 20%, ${t.primary}14 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, ${t.secondary}10 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, ${t.accent}0c 0%, transparent 50%)`;
+    
+    buildHolidayFx(t.fx || '');
+    buildTechLayer('heroLayer', 18, 3);
+    buildTechLayer('footerLayer', 8, 2);
+  }
+
+  function initTheme() {
+    const now = new Date();
+    applyTheme(THEMES[now.getMonth()]);
+  }
+
+  let _previewIdx = -1;
+  function previewNextTheme() {
+    if (_previewIdx < 0) _previewIdx = new Date().getMonth();
+    _previewIdx = (_previewIdx + 1) % 12;
+    applyTheme(THEMES[_previewIdx]);
+    showToast(`🎨 Theme: ${THEMES[_previewIdx].name}`);
+  }
+
+  function buildHolidayFx(type) {
+    const c = document.getElementById('holidayBg');
+    if (!c) return; c.innerHTML = '';
+    const FX = {
+      snow: () => { for (let i=0;i<40;i++) { const el=document.createElement('div'); el.className='snow-dot'; const sz=Math.random()*3+2; Object.assign(el.style,{width:`${sz}px`,height:`${sz}px`,left:`${Math.random()*100}%`,top:`${-Math.random()*20}%`,animationDuration:`${Math.random()*5+5}s`,animationDelay:`${Math.random()*5}s`}); c.appendChild(el); } },
+      hearts: () => { for (let i=0;i<20;i++) { const el=document.createElement('div'); el.className='heart-dot'; el.textContent='♥'; Object.assign(el.style,{left:`${Math.random()*100}%`,fontSize:`${Math.random()*10+10}px`,animationDuration:`${Math.random()*3+4}s`,animationDelay:`${Math.random()*5}s`}); c.appendChild(el); } },
+      bats: () => { for (let i=0;i<12;i++) { const el=document.createElement('div'); el.className='bat-dot'; el.textContent='🦇'; Object.assign(el.style,{top:`${Math.random()*50+5}%`,fontSize:`${Math.random()*8+14}px`,animationDuration:`${Math.random()*3+4}s`,animationDelay:`${Math.random()*5}s`}); c.appendChild(el); } },
+      confetti: () => { const clrs=['#e74c3c','#3498db','#f1c40f','#2ecc71','#9b59b6','#e84393']; for (let i=0;i<50;i++) { const el=document.createElement('div'); el.className='confetti-dot'; Object.assign(el.style,{left:`${Math.random()*100}%`,width:`${Math.random()*5+3}px`,height:`${Math.random()*10+5}px`,background:clrs[i%clrs.length],animationDuration:`${Math.random()*2+3}s`,animationDelay:`${Math.random()*5}s`}); c.appendChild(el); } },
+      fireflies: () => { const p=getComputedStyle(document.documentElement).getPropertyValue('--primary').trim(); for (let i=0;i<25;i++) { const el=document.createElement('div'); el.className='firefly-dot'; Object.assign(el.style,{left:`${Math.random()*100}%`,top:`${Math.random()*100}%`,background:p,color:p,animationDuration:`${Math.random()*2+2}s`,animationDelay:`${Math.random()*4}s`}); c.appendChild(el); } },
+      leaves: () => { const clrs=['#d35400','#e67e22','#c0392b','#a04000']; for (let i=0;i<25;i++) { const el=document.createElement('div'); el.className='leaf-dot'; Object.assign(el.style,{left:`${Math.random()*100}%`,background:clrs[i%clrs.length],animationDuration:`${Math.random()*3+4}s`,animationDelay:`${Math.random()*5}s`}); c.appendChild(el); } },
+      stars: () => { for (let i=0;i<30;i++) { const el=document.createElement('div'); el.className='star-dot'; el.textContent='★'; Object.assign(el.style,{left:`${Math.random()*100}%`,top:`${Math.random()*100}%`,color:'#f1c40f',fontSize:`${Math.random()*10+8}px`,animationDuration:`${Math.random()*1+2}s`,animationDelay:`${Math.random()*3}s`}); c.appendChild(el); } },
+      petals: () => { for (let i=0;i<20;i++) { const el=document.createElement('div'); el.className='petal-dot'; Object.assign(el.style,{left:`${Math.random()*100}%`,background:'#ff85b3',animationDuration:`${Math.random()*3+4}s`,animationDelay:`${Math.random()*5}s`}); c.appendChild(el); } },
+      bunnies: () => { for (let i=0;i<6;i++) { const el=document.createElement('div'); el.className='bunny-dot'; el.textContent=i%2===0?'🐰':'🥚'; Object.assign(el.style,{left:`${Math.random()*90+5}%`,top:`${65+Math.random()*25}%`,fontSize:`${Math.random()*6+16}px`,animationDuration:`${Math.random()*0.5+0.7}s`,animationDelay:`${Math.random()*2}s`}); c.appendChild(el); } },
+    };
+    if (FX[type]) FX[type]();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    render();
+  });
+  </script>
+</body>
+</html>
